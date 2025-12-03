@@ -1051,7 +1051,7 @@
     const [kpiData, setKpiData] = useState([]);
 
     useEffect(() => {
-      fetch('/lcdashboard/api/kpis_hoy.php')
+      fetch('api/kpis_hoy.php')
         .then(res => res.json())
         .then(json => {
           if (!json.ok) {
@@ -1562,7 +1562,7 @@
     setLoading(true);
     setError(null);
 
-    fetch('/lcdashboard/api/colaboradores.php')
+    fetch('api/colaboradores.php')
       .then(res => res.json())
       .then(json => {
         if (!json.ok) {
