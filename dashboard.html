@@ -1,0 +1,2102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LC Huamantla - Sistema de Gestión</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Paleta más limpia tipo Apple con acento naranja */
+            --primary: #ff8a3c;
+            --primary-dark: #f97316;
+            --primary-light: #ffe9d5;
+            --secondary: #64748b;
+            --accent: #ffb977;
+
+            --bg-main: #f5f5f7;
+            --bg-card: #ffffff;
+            --bg-sidebar: #f9fafb;
+            --bg-hover: #eceff4;
+
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+
+            --border: #e2e5ec;
+            --border-light: #eceff4;
+
+            --success: #16a34a;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+
+            --shadow: 0 0 0 1px rgba(15, 23, 42, 0.03);
+            --shadow-md: 0 12px 30px rgba(15, 23, 42, 0.06);
+            --shadow-lg: 0 18px 45px rgba(15, 23, 42, 0.08);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            background: radial-gradient(circle at top left, #fef3c7 0, #f5f5f7 42%, #e5e7eb 100%);
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+            box-shadow: var(--shadow);
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+
+        .logo-section {
+            padding: 24px 20px 18px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.04em;
+        }
+
+        .logo-subtitle {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 6px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+        }
+
+        .nav-section {
+            padding: 18px 12px 24px;
+        }
+
+        .nav-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            padding: 0 10px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 999px;
+            margin-bottom: 4px;
+            transition: all 0.18s ease;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: #ffffff;
+            color: var(--primary-dark);
+            box-shadow: 0 0 0 1px rgba(249, 115, 22, 0.16);
+        }
+
+        .nav-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            font-size: 18px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Topbar */
+        .topbar {
+            height: 72px;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 28px;
+            position: sticky;
+            top: 0;
+            z-index: 90;
+        }
+
+        .search-bar {
+            flex: 1;
+            max-width: 480px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 14px 10px 40px;
+            background: #f3f4f6;
+            border: 1px solid var(--border-light);
+            border-radius: 999px;
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: all 0.18s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.12);
+            background: #ffffff;
+        }
+
+        .search-input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 15px;
+        }
+
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .icon-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 999px;
+            background: #f3f4f6;
+            border: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.18s ease;
+            position: relative;
+            color: var(--text-secondary);
+            font-size: 17px;
+        }
+
+        .icon-btn:hover {
+            background: #ffffff;
+            border-color: var(--primary);
+            color: var(--primary-dark);
+            box-shadow: 0 0 0 1px rgba(249, 115, 22, 0.14);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -3px;
+            right: -3px;
+            background: var(--danger);
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 5px;
+            border-radius: 999px;
+        }
+
+        .user-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #f97316, #fdba74);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.18s ease;
+            color: white;
+            border: 1px solid #ffffff;
+        }
+
+        .user-avatar:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Content Area */
+        .content-area {
+            padding: 28px;
+            flex: 1;
+        }
+
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: var(--text-primary);
+            letter-spacing: -0.03em;
+        }
+
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        /* Dashboard Cards */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+            margin-bottom: 26px;
+        }
+
+        .kpi-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: 18px;
+            padding: 20px 18px;
+            transition: all 0.25s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(120deg, rgba(255, 138, 60, 0.09), transparent 40%);
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+
+        .kpi-card:hover::before {
+            opacity: 1;
+        }
+
+        .kpi-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+        }
+
+        .kpi-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+
+        .kpi-change {
+            display: inline-flex;
+            align-items: center;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 10px;
+            border-radius: 999px;
+            gap: 4px;
+            background: #f3f4f6;
+            color: var(--text-secondary);
+        }
+
+        .kpi-change.positive {
+            background: rgba(22, 163, 74, 0.08);
+            color: var(--success);
+        }
+
+        .kpi-change.negative {
+            background: rgba(239, 68, 68, 0.08);
+            color: var(--danger);
+        }
+
+        /* Section Cards */
+        .section-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .btn-primary {
+            background: #111827;
+            color: white;
+            border: none;
+            padding: 9px 18px;
+            border-radius: 999px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.16s ease;
+            font-size: 13px;
+        }
+
+        .btn-primary:hover {
+            background: #020617;
+            transform: translateY(-1px);
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.18);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background: #ffffff;
+            color: var(--text-primary);
+            border-radius: 999px;
+            border: 1px solid var(--border-light);
+            padding: 8px 16px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.16s ease;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+        }
+
+        /* Product Mix Table */
+        .mix-table {
+            width: 100%;
+        }
+
+        .mix-row {
+            display: grid;
+            grid-template-columns: 2fr 1.3fr 0.7fr;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-light);
+            align-items: center;
+        }
+
+        .mix-row:last-child {
+            border-bottom: none;
+        }
+
+        .product-name {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 9px;
+            background: #f3f4f6;
+            border-radius: 999px;
+            overflow: hidden;
+            border: 1px solid var(--border-light);
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #ff8a3c, #fdba74);
+            border-radius: 999px;
+            transition: width 0.4s ease;
+        }
+
+        .percentage {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-primary);
+            text-align: right;
+        }
+
+        /* Agenda Layout */
+        .agenda-layout {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .agenda-column {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: 18px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .agenda-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .agenda-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .add-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 999px;
+            background: #111827;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.16s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .add-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.24);
+        }
+
+        .calendar-mini {
+            background: #f3f4f6;
+            border-radius: 14px;
+            padding: 18px;
+            text-align: center;
+            margin-bottom: 14px;
+            border: 1px solid var(--border-light);
+        }
+
+        .event-item {
+            padding: 12px;
+            background: #f9fafb;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            border: 1px solid var(--border-light);
+            cursor: pointer;
+            transition: all 0.16s ease;
+        }
+
+        .event-item:hover {
+            transform: translateX(2px);
+            background: #ffffff;
+            box-shadow: var(--shadow-md);
+        }
+
+        .event-date {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 3px;
+            font-weight: 500;
+        }
+
+        .event-title {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        /* Checklist Styles */
+        .checklist-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 20px;
+        }
+
+        .template-list {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: 18px;
+            padding: 18px;
+            box-shadow: var(--shadow);
+        }
+
+        .template-item {
+            padding: 11px 12px;
+            background: #f3f4f6;
+            border-radius: 999px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.16s ease;
+            font-weight: 500;
+            color: var(--text-primary);
+            border: 1px solid transparent;
+            display: flex;
+            align-items: center;
+        }
+
+        .template-item:hover {
+            background: #ffffff;
+            border-color: var(--border-light);
+        }
+
+        .template-item.active {
+            background: #ffffff;
+            color: var(--primary-dark);
+            border-color: rgba(249, 115, 22, 0.3);
+            box-shadow: var(--shadow-md);
+        }
+
+        .checklist-detail {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: 18px;
+            padding: 22px;
+            box-shadow: var(--shadow);
+        }
+
+        .checklist-section {
+            margin-bottom: 20px;
+        }
+
+        .section-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            padding: 11px 12px;
+            background: #f3f4f6;
+            border-radius: 12px;
+            margin-bottom: 7px;
+            cursor: pointer;
+            transition: all 0.16s ease;
+            border: 1px solid transparent;
+        }
+
+        .checklist-item:hover {
+            background: #ffffff;
+            border-color: var(--border-light);
+        }
+
+        .checkbox {
+            width: 20px;
+            height: 20px;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+        }
+
+        .checkbox.checked {
+            background: var(--success);
+            border-color: var(--success);
+        }
+
+        /* Status Badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 5px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+        }
+
+        .status-badge.pending {
+            background: rgba(245, 158, 11, 0.08);
+            color: var(--warning);
+            border: 1px solid rgba(245, 158, 11, 0.18);
+        }
+
+        .status-badge.completed {
+            background: rgba(22, 163, 74, 0.08);
+            color: var(--success);
+            border: 1px solid rgba(22, 163, 74, 0.18);
+        }
+
+        .status-badge.danger {
+            background: rgba(239, 68, 68, 0.08);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.18);
+        }
+
+        /* Limpieza (nuevo módulo) */
+        .limpieza-card {
+            background: var(--bg-card);
+            border-radius: 22px;
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow);
+            padding: 22px 22px 20px;
+        }
+
+        .limpieza-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .limpieza-header-main {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .limpieza-header-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff7ed;
+            color: var(--primary-dark);
+            font-size: 18px;
+        }
+
+        .limpieza-header-text h2 {
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        .limpieza-header-text p {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .limpieza-meta-pill {
+            padding: 5px 10px;
+            border-radius: 999px;
+            border: 1px solid var(--border-light);
+            font-size: 11px;
+            color: var(--text-secondary);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #f9fafb;
+        }
+
+        .limpieza-form-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+            gap: 18px;
+            margin-bottom: 14px;
+        }
+
+        .limpieza-field-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-bottom: 6px;
+        }
+
+        .limpieza-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            color: var(--text-secondary);
+        }
+
+        .limpieza-tag {
+            margin-left: 8px;
+            padding: 2px 6px;
+            border-radius: 999px;
+            border: 1px solid var(--border-light);
+            font-size: 10px;
+            text-transform: uppercase;
+        }
+
+        .limpieza-control input,
+        .limpieza-control textarea {
+            width: 100%;
+            border-radius: 12px;
+            border: 1px solid var(--border-light);
+            padding: 8px 10px;
+            font-size: 13px;
+            background: #f9fafb;
+            outline: none;
+            transition: all 0.16s ease;
+        }
+
+        .limpieza-control input:focus,
+        .limpieza-control textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.14);
+            background: #ffffff;
+        }
+
+        .limpieza-helper {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .limpieza-table-wrapper {
+            border-radius: 16px;
+            border: 1px solid var(--border-light);
+            background: #f9fafb;
+            padding: 10px;
+            overflow-x: auto;
+            margin-top: 4px;
+        }
+
+        .limpieza-table {
+            width: 100%;
+            min-width: 760px;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        .limpieza-table thead {
+            background: #fff7ed;
+        }
+
+        .limpieza-table th,
+        .limpieza-table td {
+            border-bottom: 1px solid var(--border-light);
+            padding: 7px 6px;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        .limpieza-table th {
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            font-size: 11px;
+            color: #4b5563;
+        }
+
+        .limpieza-table th:first-child,
+        .limpieza-table td:first-child {
+            position: sticky;
+            left: 0;
+            background: #f9fafb;
+            z-index: 1;
+        }
+
+        .limpieza-col-tarea {
+            width: 170px;
+        }
+
+        .limpieza-tarea-input {
+            width: 100%;
+            border-radius: 10px;
+            border: 1px solid var(--border-light);
+            padding: 6px 7px;
+            font-size: 12px;
+            background: #ffffff;
+        }
+
+        .limpieza-dia-cell {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .limpieza-dia-input {
+            width: 100%;
+            border-radius: 10px;
+            border: 1px solid var(--border-light);
+            padding: 5px 7px;
+            font-size: 11px;
+            background: #ffffff;
+        }
+
+        .limpieza-check {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+            color: var(--text-secondary);
+        }
+
+        .limpieza-check input[type="checkbox"] {
+            width: 14px;
+            height: 14px;
+            accent-color: var(--primary-dark);
+        }
+
+        .limpieza-footer {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed var(--border-light);
+            margin-top: 8px;
+        }
+
+        .limpieza-footer-note {
+            font-size: 11px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .limpieza-footer-note i {
+            color: var(--primary-dark);
+        }
+
+        .limpieza-btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .limpieza-btn-primary {
+            background: #111827;
+            color: #ffffff;
+            border-radius: 999px;
+            border: none;
+            padding: 8px 18px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.16s ease;
+        }
+
+        .limpieza-btn-primary:hover {
+            background: #020617;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.24);
+            transform: translateY(-1px);
+        }
+
+        .limpieza-btn-ghost {
+            background: #ffffff;
+            border-radius: 999px;
+            border: 1px solid var(--border-light);
+            padding: 7px 15px;
+            font-size: 13px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-primary);
+            transition: all 0.16s ease;
+        }
+
+        .limpieza-btn-ghost:hover {
+            border-color: var(--primary);
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.14);
+        }
+
+        /* Animaciones */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(18px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.45s ease-out;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .agenda-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 960px) {
+            .checklist-layout {
+                grid-template-columns: 1fr;
+            }
+            .limpieza-form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .main-content {
+                margin-left: 0;
+            }
+        }
+        
+        .section-list-title {
+  font-weight: 700;
+  font-size: 13px;
+  color: #999;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.detail-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.detail-box {
+  background: #f3f4f6;
+  padding: 18px;
+  border-radius: 16px;
+  display: grid;
+  gap: 8px;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 60px;
+  opacity: 0.6;
+}
+
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+  const { useState, useEffect } = React;
+
+  // =========================
+  //    DATA ESTÁTICA
+  // =========================
+  const productMix = [
+    { name: 'Pizza de Pepperoni', percentage: 92, meta: 90 },
+    { name: 'Pizza Mexicana', percentage: 88, meta: 85 },
+    { name: 'Pizza de LTO', percentage: 75, meta: 80 },
+    { name: 'Orilla Rellena', percentage: 95, meta: 90 },
+    { name: 'Padre de Combos', percentage: 82, meta: 85 },
+    { name: 'Puff', percentage: 78, meta: 75 }
+  ];
+
+  const navItems = [
+    { id: 'dashboard', label: 'Dashboard', icon: 'bi-speedometer2' },
+    { id: 'agenda', label: 'Agenda', icon: 'bi-calendar-event' },
+    { id: 'checklists', label: 'Checklists', icon: 'bi-list-check' },
+    { id: 'charolas', label: 'Charolas', icon: 'bi-clipboard-data' },
+    { id: 'pendientes', label: 'Pendientes', icon: 'bi-exclamation-circle' },
+    { id: 'colaboradores', label: 'Colaboradores', icon: 'bi-people' },
+    { id: 'limpieza', label: 'Rol de Limpieza', icon: 'bi-broom' }
+  ];
+
+  // =========================
+  //      VISTAS
+  // =========================
+
+  function Dashboard() {
+    const [kpiData, setKpiData] = useState([]);
+
+    useEffect(() => {
+      fetch('/lcdashboard/api/kpis_hoy.php')
+        .then(res => res.json())
+        .then(json => {
+          if (!json.ok) {
+            console.warn("No hay datos de KPI hoy", json);
+            return;
+          }
+          const d = json.data;
+
+          setKpiData([
+            {
+              label: 'Venta Bruta',
+              value: `$${Number(d.ventabruta).toLocaleString('es-MX')}`,
+              positive: true,
+              change: '+0%'
+            },
+            {
+              label: 'Venta Neta',
+              value: `$${Number(d.ventaneta).toLocaleString('es-MX')}`,
+              positive: true,
+              change: '+0%'
+            },
+            {
+              label: 'Ticket Promedio',
+              value: `$${Number(d.ticketprom).toFixed(2)}`,
+              positive: true,
+              change: '+0%'
+            },
+            {
+              label: 'Clientes',
+              value: Number(d.clientes),
+              positive: false,
+              change: '-0%'
+            },
+            {
+              label: 'Cobertura Presupuesto',
+              value: `${d.coberturapresupuesto}%`,
+              positive: true,
+              change: '+0%'
+            },
+            {
+              label: 'Acumulado',
+              value: `$${Number(d.acumulado).toLocaleString('es-MX')}`,
+              positive: true,
+              change: '+0%'
+            }
+          ]);
+        })
+        .catch(err => console.error("Error API KPIs:", err));
+    }, []);
+
+    return (
+      <div className="fade-in">
+        <div className="page-header">
+          <h1 className="page-title">Dashboard</h1>
+          <p className="page-subtitle">Miércoles, 3 de Diciembre 2025</p>
+        </div>
+
+        {/* KPIs */}
+        <div className="dashboard-grid">
+          {kpiData.map((kpi, index) => (
+            <div key={index} className="kpi-card">
+              <div className="kpi-label">{kpi.label}</div>
+              <div className="kpi-value">{kpi.value}</div>
+              <span className={`kpi-change ${kpi.positive ? 'positive' : 'negative'}`}>
+                <i
+                  className={`bi ${kpi.positive ? 'bi-arrow-up' : 'bi-arrow-down'}`}
+                  style={{ marginRight: '4px' }}
+                ></i>
+                {kpi.change}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        {/* Mix de productos */}
+        <div className="section-card">
+          <div className="section-header">
+            <h2 className="section-title">Mix de Productos</h2>
+            <span className="status-badge completed">Actualizado</span>
+          </div>
+
+          <div className="mix-table">
+            {productMix.map((product, index) => (
+              <div key={index} className="mix-row">
+                <div className="product-name">{product.name}</div>
+                <div>
+                  <div className="progress-bar-container">
+                    <div
+                      className="progress-bar"
+                      style={{ width: `${product.percentage}%` }}
+                    ></div>
+                  </div>
+                </div>
+                <div className="percentage">{product.percentage}%</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Cards secundarias */}
+        <div className="dashboard-grid">
+          <div className="section-card">
+            <div className="section-header">
+              <h3 className="section-title">Cierre</h3>
+              <span className="status-badge completed">85% Completo</span>
+            </div>
+            <p style={{ color: 'var(--text-secondary)' }}>
+              23 de 27 actividades completadas
+            </p>
+          </div>
+
+          <div className="section-card">
+            <div className="section-header">
+              <h3 className="section-title">Apertura</h3>
+              <span className="status-badge pending">Pendiente</span>
+            </div>
+            <p style={{ color: 'var(--text-secondary)' }}>
+              Para mañana 06:00 AM
+            </p>
+          </div>
+
+          <div className="section-card">
+            <div className="section-header">
+              <h3 className="section-title">Pendientes</h3>
+              <span className="status-badge danger">12 Críticos</span>
+            </div>
+            <p style={{ color: 'var(--text-secondary)' }}>
+              45 pendientes totales
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  function Agenda() {
+    return (
+      <div className="fade-in">
+        <div className="page-header">
+          <h1 className="page-title">Agenda</h1>
+          <p className="page-subtitle">Gestión de permisos, eventos y cumpleaños</p>
+        </div>
+
+        <div className="agenda-layout">
+          {/* Columna permisos */}
+          <div className="agenda-column">
+            <div className="agenda-header">
+              <h3 className="agenda-title">
+                <i className="bi bi-file-earmark-text" style={{ marginRight: '6px' }}></i>
+                Permisos
+              </h3>
+              <button className="add-btn">
+                <i className="bi bi-plus-lg"></i>
+              </button>
+            </div>
+            <div className="calendar-mini">
+              <div style={{ fontSize: '22px', fontWeight: 700, marginBottom: '6px' }}>
+                Diciembre 2025
+              </div>
+              <div style={{ color: 'var(--text-secondary)', fontSize: '13px' }}>
+                5 permisos programados
+              </div>
+            </div>
+            <div className="event-item">
+              <div className="event-date">
+                <i className="bi bi-calendar-event" style={{ marginRight: '4px' }}></i>
+                5 de Diciembre
+              </div>
+              <div className="event-title">Juan Pérez - Vacaciones</div>
+            </div>
+            <div className="event-item">
+              <div className="event-date">
+                <i className="bi bi-calendar-event" style={{ marginRight: '4px' }}></i>
+                8 de Diciembre
+              </div>
+              <div className="event-title">María García - Personal</div>
+            </div>
+            <div className="event-item">
+              <div className="event-date">
+                <i className="bi bi-calendar-event" style={{ marginRight: '4px' }}></i>
+                12 de Diciembre
+              </div>
+              <div className="event-title">Carlos López - Médico</div>
+            </div>
+          </div>
+
+          {/* Columna eventos */}
+          <div className="agenda-column">
+            <div className="agenda-header">
+              <h3 className="agenda-title">
+                <i className="bi bi-flag" style={{ marginRight: '6px' }}></i>
+                Eventos
+              </h3>
+              <button className="add-btn">
+                <i className="bi bi-plus-lg"></i>
+              </button>
+            </div>
+            <div className="calendar-mini">
+              <div style={{ fontSize: '22px', fontWeight: 700, marginBottom: '6px' }}>
+                Diciembre 2025
+              </div>
+              <div style={{ color: 'var(--text-secondary)', fontSize: '13px' }}>
+                3 eventos próximos
+              </div>
+            </div>
+            <div className="event-item">
+              <div className="event-date">
+                <i className="bi bi-calendar-event" style={{ marginRight: '4px' }}></i>
+                10 de Diciembre
+              </div>
+              <div className="event-title">Capacitación de Servicio</div>
+            </div>
+            <div className="event-item">
+              <div className="event-date">
+                <i className="bi bi-calendar-event" style={{ marginRight: '4px' }}></i>
+                15 de Diciembre
+              </div>
+              <div className="event-title">Junta Gerencial</div>
+            </div>
+            <div className="event-item">
+              <div className="event-date">
+                <i className="bi bi-calendar-event" style={{ marginRight: '4px' }}></i>
+                20 de Diciembre
+              </div>
+              <div className="event-title">Inventario Mensual</div>
+            </div>
+          </div>
+
+          {/* Columna cumpleaños */}
+          <div className="agenda-column">
+            <div className="agenda-header">
+              <h3 className="agenda-title">
+                <i className="bi bi-gift" style={{ marginRight: '6px' }}></i>
+                Cumpleaños
+              </h3>
+              <button className="add-btn">
+                <i className="bi bi-plus-lg"></i>
+              </button>
+            </div>
+            <div className="calendar-mini">
+              <div style={{ fontSize: '22px', fontWeight: 700, marginBottom: '6px' }}>
+                Diciembre 2025
+              </div>
+              <div style={{ color: 'var(--text-secondary)', fontSize: '13px' }}>
+                4 cumpleaños este mes
+              </div>
+            </div>
+            <div className="event-item">
+              <div className="event-date">
+                <i className="bi bi-calendar-event" style={{ marginRight: '4px' }}></i>
+                7 de Diciembre
+              </div>
+              <div className="event-title">Ana Martínez</div>
+            </div>
+            <div className="event-item">
+              <div className="event-date">
+                <i className="bi bi-calendar-event" style={{ marginRight: '4px' }}></i>
+                14 de Diciembre
+              </div>
+              <div className="event-title">Roberto Sánchez</div>
+            </div>
+            <div className="event-item">
+              <div className="event-date">
+                <i className="bi bi-calendar-event" style={{ marginRight: '4px' }}></i>
+                22 de Diciembre
+              </div>
+              <div className="event-title">Laura Hernández</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  function Checklists() {
+    const [activeTemplate, setActiveTemplate] = useState('recorrido');
+
+    const templates = [
+      { id: 'recorrido', name: 'Recorrido', icon: 'bi-pin-map' },
+      { id: 'cierre', name: 'Limpieza de Cierre', icon: 'bi-broom' },
+      { id: 'apertura', name: 'Turno de Apertura', icon: 'bi-sunrise' },
+      { id: 'cierre-turno', name: 'Turno de Cierre', icon: 'bi-moon-stars' },
+      { id: 'lider', name: 'Actividades de Líder', icon: 'bi-person-badge' }
+    ];
+
+    const checklistItems = {
+      recorrido: [
+        {
+          section: 'Prioridad',
+          items: ['Verificar inventario crítico', 'Revisar temperaturas', 'Confirmar personal']
+        },
+        {
+          section: 'Comedor',
+          items: ['Limpieza de mesas', 'Orden de sillas', 'Ventanas limpias']
+        },
+        {
+          section: 'Baños',
+          items: ['Sanitarios', 'Lavabos', 'Suministros']
+        },
+        {
+          section: 'Cocina',
+          items: ['Estaciones limpias', 'Equipos funcionando', 'Almacenamiento correcto']
+        }
+      ]
+    };
+
+    return (
+      <div className="fade-in">
+        <div className="page-header">
+          <h1 className="page-title">Checklists</h1>
+          <p className="page-subtitle">Plantillas de supervisión y control</p>
+        </div>
+
+        <div className="checklist-layout">
+          <div className="template-list">
+            <h3 style={{ marginBottom: '14px', fontSize: '15px', fontWeight: 600 }}>Plantillas</h3>
+            {templates.map(template => (
+              <div
+                key={template.id}
+                className={`template-item ${activeTemplate === template.id ? 'active' : ''}`}
+                onClick={() => setActiveTemplate(template.id)}
+              >
+                <i className={`bi ${template.icon}`} style={{ marginRight: '8px' }}></i>
+                {template.name}
+              </div>
+            ))}
+          </div>
+
+          <div className="checklist-detail">
+            <div className="section-header">
+              <h2 className="section-title">Recorrido</h2>
+              <button className="btn-primary">
+                <i className="bi bi-check-lg" style={{ marginRight: '6px' }}></i>
+                Completar
+              </button>
+            </div>
+
+            {checklistItems.recorrido.map((section, idx) => (
+              <div key={idx} className="checklist-section">
+                <div className="section-label">{section.section}</div>
+                {section.items.map((item, itemIdx) => (
+                  <div key={itemIdx} className="checklist-item">
+                    <div className="checkbox"></div>
+                    <span>{item}</span>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  function Charolas() {
+    const charolas = [
+      { colaborador: 'Juan Pérez', area: 'PAN', estado: 'Realizada' },
+      { colaborador: 'María García', area: 'PAN', estado: 'Pendiente' },
+      { colaborador: 'Carlos López', area: 'PAN', estado: 'Realizada' },
+      { colaborador: 'Ana Martínez', area: 'PAN', estado: 'Pendiente' }
+    ];
+
+    return (
+      <div className="fade-in">
+        <div className="page-header">
+          <h1 className="page-title">Charolas</h1>
+          <p className="page-subtitle">Control semanal de charolas</p>
+        </div>
+
+        <div className="section-card">
+          <div className="section-header">
+            <h2 className="section-title">Semana actual</h2>
+            <button className="btn-primary">
+              <i className="bi bi-plus-lg" style={{ marginRight: '6px' }}></i>
+              Agregar
+            </button>
+          </div>
+
+          <div style={{ display: 'grid', gap: '12px' }}>
+            {charolas.map((charola, idx) => (
+              <div
+                key={idx}
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '16px 18px',
+                  background: '#f3f4f6',
+                  borderRadius: '14px',
+                  border: '1px solid var(--border-light)'
+                }}
+              >
+                <div>
+                  <div style={{ fontWeight: 600, marginBottom: 3 }}>{charola.colaborador}</div>
+                  <div style={{ color: 'var(--text-secondary)', fontSize: 13 }}>
+                    {charola.area}
+                  </div>
+                </div>
+                <span
+                  className={`status-badge ${
+                    charola.estado === 'Realizada' ? 'completed' : 'pending'
+                  }`}
+                >
+                  {charola.estado}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  function Pendientes() {
+    const categories = ['Administrativos', 'Mantenimiento', 'Operativos'];
+
+    const pendientes = {
+      Administrativos: [
+        { titulo: 'Revisar nómina', prioridad: 'Alta', responsable: 'Gerente', estado: 'En proceso' },
+        { titulo: 'Actualizar inventario', prioridad: 'Media', responsable: 'Subgerente', estado: 'Abierto' }
+      ],
+      Mantenimiento: [
+        { titulo: 'Reparar horno 2', prioridad: 'Alta', responsable: 'Técnico', estado: 'Abierto' },
+        { titulo: 'Mantenimiento preventivo', prioridad: 'Baja', responsable: 'Auxiliar', estado: 'Terminado' }
+      ],
+      Operativos: [
+        { titulo: 'Capacitación meseros', prioridad: 'Alta', responsable: 'Líder', estado: 'En proceso' },
+        { titulo: 'Revisar recetas', prioridad: 'Media', responsable: 'Chef', estado: 'Abierto' }
+      ]
+    };
+
+    return (
+      <div className="fade-in">
+        <div className="page-header">
+          <h1 className="page-title">Pendientes</h1>
+          <p className="page-subtitle">Gestión de tareas y seguimiento</p>
+        </div>
+
+        {categories.map((category, idx) => (
+          <div key={idx} className="section-card">
+            <div className="section-header">
+              <h2 className="section-title">{category}</h2>
+              <button className="btn-primary">
+                <i className="bi bi-plus-lg" style={{ marginRight: '6px' }}></i>
+                Agregar
+              </button>
+            </div>
+
+            <div style={{ display: 'grid', gap: '12px' }}>
+              {pendientes[category].map((item, itemIdx) => (
+                <div
+                  key={itemIdx}
+                  style={{
+                    padding: '16px 18px',
+                    background: '#f3f4f6',
+                    borderRadius: '14px',
+                    border: '1px solid var(--border-light)',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                  }}
+                >
+                  <div>
+                    <div style={{ fontWeight: 600, marginBottom: 6 }}>{item.titulo}</div>
+                    <div
+                      style={{
+                        display: 'flex',
+                        gap: 10,
+                        fontSize: 13,
+                        color: 'var(--text-secondary)'
+                      }}
+                    >
+                      <span>
+                        <i className="bi bi-person" style={{ marginRight: '4px' }}></i>
+                        {item.responsable}
+                      </span>
+                      <span>• Prioridad: {item.prioridad}</span>
+                    </div>
+                  </div>
+                  <span
+                    className={`status-badge ${
+                      item.estado === 'Terminado'
+                        ? 'completed'
+                        : item.estado === 'En proceso'
+                        ? 'pending'
+                        : 'danger'
+                    }`}
+                  >
+                    {item.estado}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  function Colaboradores() {
+  const [colaboradores, setColaboradores] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState(null);
+  const [filtroPuesto, setFiltroPuesto] = React.useState('todos'); // todos | anfitrion | cocina
+  const [busqueda, setBusqueda] = React.useState('');
+
+  React.useEffect(() => {
+    setLoading(true);
+    setError(null);
+
+    fetch('/lcdashboard/api/colaboradores.php')
+      .then(res => res.json())
+      .then(json => {
+        if (!json.ok) {
+          throw new Error('Respuesta no válida de API');
+        }
+        setColaboradores(json.data);
+      })
+      .catch(err => {
+        console.warn('Fallo API, uso datos de ejemplo:', err);
+
+        // Fallback estático para que siempre se vea algo
+        setColaboradores([
+          { id: '88049', nombre: 'ADAIR PEREZ LOZADA', puesto: 'COCINA', status: 'ACTIVO', antiguedad: 0 },
+          { id: '79530', nombre: 'DURAN HERNANDEZ MARIA G.', puesto: 'COCINA', status: 'ACTIVO', antiguedad: 1 },
+          { id: '86564', nombre: 'GARCIA SOLANO MIGUEL A.', puesto: 'ANFITRION', status: 'ACTIVO', antiguedad: 2 },
+          { id: '75291', nombre: 'HERNANDEZ ROMERO NANCY', puesto: 'ANFITRION', status: 'PERMISO', antiguedad: 1 }
+        ]);
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  const getPuestoTag = (puesto) => {
+    const p = (puesto || '').toUpperCase();
+    if (p.includes('ANFIT')) {
+      return { label: 'Anfitrión', className: 'status-badge completed' };
+    }
+    if (p.includes('COCINA')) {
+      return { label: 'Cocina', className: 'status-badge pending' };
+    }
+    return { label: p || 'Otro', className: 'status-badge' };
+  };
+
+  const getStatusTag = (status) => {
+    const s = (status || '').toUpperCase();
+    if (s === 'ACTIVO') return { label: 'Activo', className: 'status-badge completed' };
+    if (s === 'PERMISO') return { label: 'Permiso', className: 'status-badge pending' };
+    return { label: status || 'N/A', className: 'status-badge danger' };
+  };
+
+  // Filtrado por puesto + búsqueda
+  const filtrados = colaboradores.filter(colab => {
+    const puesto = (colab.puesto || '').toLowerCase();
+    const nombre = (colab.nombre || '').toLowerCase();
+    const id = (colab.id || '').toString().toLowerCase();
+
+    const pasaPuesto =
+      filtroPuesto === 'todos'
+        ? true
+        : filtroPuesto === 'anfitrion'
+        ? puesto.includes('anfit')
+        : puesto.includes('cocina');
+
+    const term = busqueda.trim().toLowerCase();
+    const pasaBusqueda = !term || nombre.includes(term) || id.includes(term);
+
+    return pasaPuesto && pasaBusqueda;
+  });
+
+  return (
+    <div className="fade-in">
+      <div className="page-header">
+        <h1 className="page-title">Colaboradores</h1>
+        <p className="page-subtitle">
+          Vista general de personal por área. Diferencia visual entre <strong>Anfitrión</strong> y <strong>Cocina</strong>.
+        </p>
+      </div>
+
+      <div className="checklist-layout">
+        {/* Panel lateral de filtros */}
+        <div className="template-list">
+          <h3 style={{ marginBottom: '14px', fontSize: '15px', fontWeight: 600 }}>Filtros</h3>
+
+          <div
+            className={`template-item ${filtroPuesto === 'todos' ? 'active' : ''}`}
+            onClick={() => setFiltroPuesto('todos')}
+          >
+            <i className="bi bi-people" style={{ marginRight: 8 }}></i>
+            Todos
+          </div>
+
+          <div
+            className={`template-item ${filtroPuesto === 'anfitrion' ? 'active' : ''}`}
+            onClick={() => setFiltroPuesto('anfitrion')}
+          >
+            <i className="bi bi-person-hearts" style={{ marginRight: 8, color: '#0EA5E9' }}></i>
+            Solo Anfitriones
+          </div>
+
+          <div
+            className={`template-item ${filtroPuesto === 'cocina' ? 'active' : ''}`}
+            onClick={() => setFiltroPuesto('cocina')}
+          >
+            <i className="bi bi-fire" style={{ marginRight: 8, color: '#F97316' }}></i>
+            Solo Cocina
+          </div>
+
+          <div style={{ marginTop: 16 }}>
+            <label
+              style={{
+                fontSize: 12,
+                fontWeight: 500,
+                color: 'var(--text-secondary)',
+                marginBottom: 4,
+                display: 'block'
+              }}
+            >
+              Buscar
+            </label>
+            <div style={{ position: 'relative' }}>
+              <i
+                className="bi bi-search"
+                style={{
+                  position: 'absolute',
+                  left: 10,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  fontSize: 14,
+                  color: '#9CA3AF'
+                }}
+              ></i>
+              <input
+                type="text"
+                placeholder="Nombre o ID"
+                value={busqueda}
+                onChange={e => setBusqueda(e.target.value)}
+                style={{
+                  width: '100%',
+                  borderRadius: 999,
+                  border: '1px solid var(--border-light)',
+                  padding: '8px 12px 8px 30px',
+                  fontSize: 13,
+                  outline: 'none'
+                }}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Detalle de colaboradores */}
+        <div className="checklist-detail">
+          <div className="section-header">
+            <h2 className="section-title">Listado de colaboradores</h2>
+            <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
+              {loading ? 'Cargando...' : `${filtrados.length} colaboradores`}
+            </span>
+          </div>
+
+          {error && (
+            <div
+              style={{
+                marginBottom: 12,
+                padding: '10px 12px',
+                borderRadius: 12,
+                background: '#FEF2F2',
+                color: '#B91C1C',
+                fontSize: 13
+              }}
+            >
+              {error}
+            </div>
+          )}
+
+          <div style={{ display: 'grid', gap: 10 }}>
+            {filtrados.map(colab => {
+              const puestoTag = getPuestoTag(colab.puesto);
+              const statusTag = getStatusTag(colab.status);
+
+              const isAnfitrion = puestoTag.label === 'Anfitrión';
+              const leftBorderColor = isAnfitrion ? '#0EA5E9' : '#F97316';
+              const iconClass = isAnfitrion ? 'bi-person-hearts' : 'bi-fire';
+
+              return (
+                <div
+                  key={colab.id}
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '14px 16px',
+                    borderRadius: 16,
+                    border: '1px solid var(--border-light)',
+                    background: '#F9FAFB',
+                    boxShadow: '0 1px 2px rgba(15,23,42,0.03)',
+                    borderLeft: `4px solid ${leftBorderColor}`
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div
+                      style={{
+                        width: 34,
+                        height: 34,
+                        borderRadius: 999,
+                        background: '#FFF',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        border: '1px solid var(--border-light)'
+                      }}
+                    >
+                      <i className={`bi ${iconClass}`} style={{ fontSize: 18, color: leftBorderColor }}></i>
+                    </div>
+                    <div>
+                      <div style={{ fontWeight: 600, fontSize: 14 }}>{colab.nombre}</div>
+                      <div
+                        style={{
+                          fontSize: 12,
+                          color: 'var(--text-secondary)',
+                          display: 'flex',
+                          gap: 8,
+                          marginTop: 2
+                        }}
+                      >
+                        <span>ID: {colab.id}</span>
+                        {colab.antiguedad != null && (
+                          <span>• Antigüedad: {colab.antiguedad} años</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
+                    <span className={puestoTag.className}>{puestoTag.label}</span>
+                    <span className={statusTag.className}>{statusTag.label}</span>
+                  </div>
+                </div>
+              );
+            })}
+
+            {!loading && filtrados.length === 0 && (
+              <div
+                style={{
+                  padding: '18px 16px',
+                  borderRadius: 16,
+                  background: '#F9FAFB',
+                  border: '1px dashed var(--border-light)',
+                  fontSize: 13,
+                  color: 'var(--text-secondary)'
+                }}
+              >
+                No hay colaboradores que coincidan con el filtro actual.
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Limpieza() {
+    const rows = [
+      { id: 1, placeholder: 'Esqueleto de horno 1' },
+      { id: 2, placeholder: 'Frentes de horno' },
+      { id: 3, placeholder: 'Tarimas de wash' },
+      { id: 4, placeholder: 'Trapeador rojo' },
+      { id: 5, placeholder: 'Piso de garrafones' },
+      { id: 6, placeholder: 'Área adicional' },
+      { id: 7, placeholder: 'Área adicional' }
+    ];
+
+    const handleSubmit = (e) => {
+      e.preventDefault();
+      alert('Aquí se dispara la generación del PDF con la plantilla corporativa de Rol de Limpieza.');
+    };
+
+    return (
+      <div className="fade-in">
+        <div className="page-header">
+          <h1 className="page-title">Rol de Limpieza</h1>
+          <p className="page-subtitle">
+            Asigna responsables por día y genera el formato oficial para impresión y resguardo.
+          </p>
+        </div>
+
+        <section className="limpieza-card">
+          <header className="limpieza-header">
+            <div className="limpieza-header-main">
+              <div className="limpieza-header-icon">
+                <i className="bi bi-broom"></i>
+              </div>
+              <div className="limpieza-header-text">
+                <h2>Programación semanal</h2>
+                <p>Completa el rol. Al guardar podrás generar el PDF con el diseño corporativo.</p>
+              </div>
+            </div>
+            <div>
+              <div className="limpieza-meta-pill">
+                <i className="bi bi-file-earmark-pdf"></i>
+                Formato tablóide · LC Huamantla
+              </div>
+            </div>
+          </header>
+
+          <form onSubmit={handleSubmit}>
+            <div className="limpieza-form-grid">
+              <div>
+                <div className="limpieza-field-group">
+                  <label className="limpieza-label" htmlFor="semana">
+                    Semana
+                    <span className="limpieza-tag">Obligatoria</span>
+                  </label>
+                  <div className="limpieza-control">
+                    <input type="week" id="semana" name="semana" required />
+                  </div>
+                  <p className="limpieza-helper">
+                    Esta etiqueta se imprimirá en el encabezado del PDF.
+                  </p>
+                </div>
+
+                <div className="limpieza-field-group">
+                  <label className="limpieza-label" htmlFor="fecha-inicio">
+                    Fecha de inicio
+                  </label>
+                  <div className="limpieza-control">
+                    <input type="date" id="fecha-inicio" name="fechaInicio" />
+                  </div>
+                </div>
+
+                <div className="limpieza-field-group">
+                  <label className="limpieza-label" htmlFor="fecha-fin">
+                    Fecha de fin
+                  </label>
+                  <div className="limpieza-control">
+                    <input type="date" id="fecha-fin" name="fechaFin" />
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <div className="limpieza-field-group">
+                  <label className="limpieza-label" htmlFor="charola-semana">
+                    Esta semana toca charola de
+                    <span className="limpieza-tag">Pie del PDF</span>
+                  </label>
+                  <div className="limpieza-control">
+                    <input
+                      type="text"
+                      id="charola-semana"
+                      name="charolaSemana"
+                      placeholder="Ej. Cocina caliente · Área de hornos"
+                      required
+                    />
+                  </div>
+                  <p className="limpieza-helper">
+                    Se imprime en la zona “ESTA SEMANA TOCA CHAROLA DE:” del formato oficial.
+                  </p>
+                </div>
+
+                <div className="limpieza-field-group">
+                  <label className="limpieza-label" htmlFor="notas">
+                    Notas internas
+                  </label>
+                  <div className="limpieza-control">
+                    <textarea
+                      id="notas"
+                      name="notas"
+                      placeholder="Aclaraciones especiales, limpieza profunda, apoyo de otro turno, etc."
+                    ></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="limpieza-field-group">
+              <div className="limpieza-label">
+                Asignaciones por tarea y día
+                <span className="limpieza-tag">7 líneas como la plantilla</span>
+              </div>
+              <p className="limpieza-helper">
+                Cada fila es una tarea o área. En cada columna indica el responsable y marca “Hecho”.
+              </p>
+            </div>
+
+            <div className="limpieza-table-wrapper">
+              <table className="limpieza-table" aria-label="Rol de limpieza semanal">
+                <thead>
+                  <tr>
+                    <th className="limpieza-col-tarea">Tarea / Área</th>
+                    <th>Lun</th>
+                    <th>Mar</th>
+                    <th>Mié</th>
+                    <th>Jue</th>
+                    <th>Vie</th>
+                    <th>Sáb</th>
+                    <th>Dom</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rows.map((row) => (
+                    <tr key={row.id}>
+                      <td>
+                        <input
+                          type="text"
+                          className="limpieza-tarea-input"
+                          name={`tarea[${row.id}]`}
+                          placeholder={row.placeholder}
+                        />
+                      </td>
+                      {['lun', 'mar', 'mie', 'jue', 'vie', 'sab', 'dom'].map((dia) => (
+                        <td key={dia}>
+                          <div className="limpieza-dia-cell">
+                            <input
+                              type="text"
+                              className="limpieza-dia-input"
+                              name={`${dia}[${row.id}]`}
+                              placeholder="Responsable"
+                            />
+                            <label className="limpieza-check">
+                              <input
+                                type="checkbox"
+                                name={`${dia}Done[${row.id}]`}
+                              />
+                              <span>Hecho</span>
+                            </label>
+                          </div>
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="limpieza-footer">
+              <div className="limpieza-footer-note">
+                <i className="bi bi-info-circle"></i>
+                <span>
+                  El PDF respetará columnas LUN–DOM y el pie “ESTA SEMANA TOCA CHAROLA DE…”.
+                </span>
+              </div>
+              <div className="limpieza-btn-group">
+                <button type="button" className="limpieza-btn-ghost">
+                  <i className="bi bi-eye"></i>
+                  Vista previa (próximamente)
+                </button>
+                <button type="submit" className="limpieza-btn-primary">
+                  <i className="bi bi-file-earmark-arrow-down"></i>
+                  Generar PDF
+                </button>
+              </div>
+            </div>
+          </form>
+        </section>
+      </div>
+    );
+  }
+
+  // =========================
+  //       APP SHELL
+  // =========================
+
+  function App() {
+    const [activeView, setActiveView] = useState('dashboard');
+    const [searchQuery, setSearchQuery] = useState('');
+
+    const renderContent = () => {
+      switch (activeView) {
+        case 'dashboard':
+          return <Dashboard />;
+        case 'agenda':
+          return <Agenda />;
+        case 'checklists':
+          return <Checklists />;
+        case 'charolas':
+          return <Charolas />;
+        case 'pendientes':
+          return <Pendientes />;
+        case 'colaboradores':
+          return <Colaboradores />;
+        case 'limpieza':
+          return <Limpieza />;
+        default:
+          return <Dashboard />;
+      }
+    };
+
+    return (
+      <div className="app-container">
+        <aside className="sidebar">
+          <div className="logo-section">
+            <div className="logo">LC HUAMANTLA</div>
+            <div className="logo-subtitle">Sistema de gestión</div>
+          </div>
+
+          <nav className="nav-section">
+            <div className="nav-label">Principal</div>
+            {navItems.map(item => (
+              <div
+                key={item.id}
+                className={`nav-item ${activeView === item.id ? 'active' : ''}`}
+                onClick={() => setActiveView(item.id)}
+              >
+                <i className={`bi ${item.icon} nav-icon`}></i>
+                {item.label}
+              </div>
+            ))}
+          </nav>
+        </aside>
+
+        <main className="main-content">
+          {/* TOPBAR */}
+          <div className="topbar">
+            <div className="search-bar">
+              <i className="bi bi-search search-icon"></i>
+              <input
+                type="text"
+                className="search-input"
+                placeholder="Buscar colaboradores, pendientes, bitácoras..."
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+              />
+            </div>
+
+            <div className="topbar-actions">
+              <button className="icon-btn">
+                <i className="bi bi-bell"></i>
+                <span className="notification-badge">5</span>
+              </button>
+              <div className="user-avatar">LC</div>
+            </div>
+          </div>
+
+          {/* CONTENIDO CON PADDING */}
+          <div className="content-area">
+            {renderContent()}
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  ReactDOM.render(<App />, document.getElementById('root'));
+</script>
+
+
+</body>
+</html>
